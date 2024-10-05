@@ -11,6 +11,7 @@ function App() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(''); // Add state for search term
 
   // Fetch Users
   useEffect(() => {
@@ -41,6 +42,11 @@ function App() {
     toast.success("User deleted successfully!");
   };
 
+  // Filtered users based on search term
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error loading users</div>;
 
@@ -49,14 +55,22 @@ function App() {
       <nav>
         <Link to="/">Home</Link>
         <Link to="/add">Add User</Link>
+        <input
+          type="text"
+          placeholder="Search by name"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ marginLeft: '20px' }} // Add some spacing
+        />
       </nav>
 
       <Routes>
-        <Route path="/" element={<UserTable users={users} onDelete={deleteUser} />} />
+        <Route path="/" element={<UserTable users={filteredUsers} onDelete={deleteUser} />} />
         <Route path="/add" element={<UserForm onSubmit={addUser} />} />
         <Route path="/edit/:id" element={<UserForm users={users} onSubmit={updateUser} />} />
         <Route path="/user/:id" element={<UserDetail users={users} />} />
       </Routes>
+      <ToastContainer />
     </div>
   );
 }
